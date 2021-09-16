@@ -1,0 +1,352 @@
+   RDSKey:
+     Type: AWS::KMS::Key
+     Properties:
+       EnableKeyRotation: true
+       KeyPolicy:
+         Version: '2012-10-17'
+         Id: key-policy-1
+         Statement:
+         - Sid: Allow access for Key Administrators
+           Effect: Allow
+           Principal:
+             AWS: !Ref AdministratorsRoleArn
+           Action:
+           - kms:Create*
+           - kms:Describe*
+           - kms:Enable*
+           - kms:List*
+           - kms:Put*
+           - kms:Update*
+           - kms:Revoke*
+           - kms:Disable*
+           - kms:Get*
+           - kms:Delete*
+           - kms:TagResource
+           - kms:UntagResource
+           - kms:ScheduleKeyDeletion
+           - kms:CancelKeyDeletion
+           Resource: "*"
+         - Sid: Allow access for Key Administrators
+           Effect: Allow
+           Principal:
+             AWS: !Ref CloudFormationStackSetExecutionRole
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:Create*
+           - kms:Describe*
+           - kms:Enable*
+           - kms:List*
+           - kms:Put*
+           - kms:Update*
+           - kms:Revoke*
+           - kms:Disable*
+           - kms:Get*
+           - kms:Delete*
+           - kms:TagResource
+           - kms:UntagResource
+           - kms:ScheduleKeyDeletion
+           - kms:CancelKeyDeletion
+           Resource: "*"
+         - Sid: Allow use of the key
+           Effect: Allow
+           Principal:
+             AWS:
+               - !Ref BastionInstanceRoleArn
+               - !Ref ApplicationInstanceRoleArn
+               - !Ref AWSServiceRoleForAutoScaling
+               - !Ref StreamNodeInstanceRoleArn
+               - !Ref BGroundInstanceRoleArn
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:DescribeKey
+           Resource: "*"
+         - Sid: Allow attachment of persistent resources
+           Effect: Allow
+           Principal:
+             AWS: !Ref AdministratorsRoleArn
+           Action:
+           - kms:CreateGrant
+           - kms:ListGrants
+           - kms:RevokeGrant
+           Resource: "*"
+           Condition:
+             Bool:
+               kms:GrantIsForAWSResource: 'true'
+       Tags:
+        - Key: Name
+          Value: !Sub Pega-${Environment}-EBS-key
+        - Key: Domain
+          Value: DEV
+        - Key: Department
+          Value: DEV
+        - Key: Project
+          Value: Pega
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: PONumber
+          Value: PO1234
+        - Key: ManagedBy
+          Value: vfast
+        - Key: TaggingVersion
+          Value: V2.4
+        - Key: BU
+          Value: BU
+        - Key: Confidentiality
+          Value: C2
+        - Key: SecurityZone
+          Value: DEV
+   RDSKeyAlias:
+      Type: AWS::KMS::Alias
+      Properties:
+         AliasName: !Sub alias/Pega-${Environment}-RDS-key
+         TargetKeyId:
+           Ref: RDSKey
+  
+##############################################################
+#EFS
+   EFSKey:
+     Type: AWS::KMS::Key
+     Properties:
+       EnableKeyRotation: true
+       KeyPolicy:
+         Version: '2012-10-17'
+         Id: key-policy-1
+         Statement:
+         - Sid: Allow access for Key Administrators
+           Effect: Allow
+           Principal:
+             AWS: !Ref AdministratorsRoleArn
+           Action:
+           - kms:Create*
+           - kms:Describe*
+           - kms:Enable*
+           - kms:List*
+           - kms:Put*
+           - kms:Update*
+           - kms:Revoke*
+           - kms:Disable*
+           - kms:Get*
+           - kms:Delete*
+           - kms:TagResource
+           - kms:UntagResource
+           - kms:ScheduleKeyDeletion
+           - kms:CancelKeyDeletion
+           Resource: "*"
+         - Sid: Allow access for Key Administrators
+           Effect: Allow
+           Principal:
+             AWS: !Ref CloudFormationStackSetExecutionRole
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:Create*
+           - kms:Describe*
+           - kms:Enable*
+           - kms:List*
+           - kms:Put*
+           - kms:Update*
+           - kms:Revoke*
+           - kms:Disable*
+           - kms:Get*
+           - kms:Delete*
+           - kms:TagResource
+           - kms:UntagResource
+           - kms:ScheduleKeyDeletion
+           - kms:CancelKeyDeletion
+           Resource: "*"
+         - Sid: Allow use of the key
+           Effect: Allow
+           Principal:
+             AWS: 
+               - !Ref BastionInstanceRoleArn
+               - !Ref ApplicationInstanceRoleArn
+               - !Ref AWSServiceRoleForAutoScaling
+               - !Ref StreamNodeInstanceRoleArn
+               - !Ref BGroundInstanceRoleArn
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:DescribeKey
+           Resource: "*"
+         - Sid: Allow attachment of persistent resources
+           Effect: Allow
+           Principal:
+             AWS: !Ref AdministratorsRoleArn
+           Action:
+           - kms:CreateGrant
+           - kms:ListGrants
+           - kms:RevokeGrant
+           Resource: "*"
+           Condition:
+             Bool:
+               kms:GrantIsForAWSResource: 'true'
+       Tags:
+        - Key: Name
+          Value: !Sub Pega-${Environment}-EFS-key
+        - Key: Domain
+          Value: DEV
+        - Key: Department
+          Value: DEV
+        - Key: Project
+          Value: Pega
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: PONumber
+          Value: PO123456789
+        - Key: ManagedBy
+          Value: vfast.aws-support-uk@vodafone.com
+        - Key: TaggingVersion
+          Value: V2.4
+        - Key: Confidentiality
+          Value: C2
+        - Key: SecurityZone
+          Value: DEV
+   EFSKeyAlias:
+      Type: AWS::KMS::Alias
+      Properties:
+         AliasName: !Sub alias/Pega-${Environment}-EFS-key
+         TargetKeyId:
+           Ref: EFSKey
+           
+   S3Key:
+     Type: AWS::KMS::Key
+     Properties:
+       EnableKeyRotation: true
+       KeyPolicy:
+         Version: '2012-10-17'
+         Id: key-policy-1
+         Statement:
+         - Sid: Allow access for Key Administrators
+           Effect: Allow
+           Principal:
+             AWS: !Ref AdministratorsRoleArn
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:Create*
+           - kms:Describe*
+           - kms:Enable*
+           - kms:List*
+           - kms:Put*
+           - kms:Update*
+           - kms:Revoke*
+           - kms:Disable*
+           - kms:Get*
+           - kms:Delete*
+           - kms:TagResource
+           - kms:UntagResource
+           - kms:ScheduleKeyDeletion
+           - kms:CancelKeyDeletion
+           Resource: "*"
+         - Sid: Allow access for Key Administrators
+           Effect: Allow
+           Principal:
+             AWS: !Ref CloudFormationStackSetExecutionRole
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:Create*
+           - kms:Describe*
+           - kms:Enable*
+           - kms:List*
+           - kms:Put*
+           - kms:Update*
+           - kms:Revoke*
+           - kms:Disable*
+           - kms:Get*
+           - kms:Delete*
+           - kms:TagResource
+           - kms:UntagResource
+           - kms:ScheduleKeyDeletion
+           - kms:CancelKeyDeletion
+           Resource: "*"
+         - Sid: Allow use of the key
+           Effect: Allow
+           Principal:
+             AWS: 
+               - !Ref BastionInstanceRoleArn
+               - !Ref ApplicationInstanceRoleArn
+               - !Ref AWSServiceRoleForAutoScaling
+               - !Ref StreamNodeInstanceRoleArn
+               - !Ref BGroundInstanceRoleArn
+           Action:
+           - kms:Encrypt
+           - kms:Decrypt
+           - kms:ReEncrypt*
+           - kms:GenerateDataKey*
+           - kms:DescribeKey
+           Resource: "*"
+         - Sid: Allow attachment of persistent resources
+           Effect: Allow
+           Principal:
+             AWS: !Ref AdministratorsRoleArn
+           Action:
+           - kms:CreateGrant
+           - kms:ListGrants
+           - kms:RevokeGrant
+           Resource: "*"
+           Condition:
+             Bool:
+               kms:GrantIsForAWSResource: 'true'
+       Tags:
+        - Key: Name
+          Value: !Sub Pega-${Environment}-S3-key
+        - Key: Domain
+          Value: DEV
+        - Key: Department
+          Value: DEV
+        - Key: Project
+          Value: Pega
+        - Key: Environment
+          Value: !Sub ${Environment}
+        - Key: PONumber
+          Value: PO1234
+        - Key: ManagedBy
+          Value: vfast
+        - Key: TaggingVersion
+          Value: V2.4
+        - Key: BU
+          Value: BU
+        - Key: Confidentiality
+          Value: C2
+        - Key: SecurityZone
+          Value: DEV
+   S3KeyAlias:
+      Type: AWS::KMS::Alias
+      Properties:
+         AliasName: !Sub alias/Pega-${Environment}-S3-key
+         TargetKeyId:
+           Ref: S3Key
+
+
+Outputs:
+   EBSKeyId:
+     Value: !GetAtt
+             - EBSKey
+             - Arn
+   RDSKeyId:
+     Value: !GetAtt
+             - RDSKey
+             - Arn
+   EFSKeyId:
+     Value: !GetAtt
+             - EFSKey
+             - Arn
+   S3KeyId:
+     Value: !GetAtt
+             - S3Key
+             - Arn
